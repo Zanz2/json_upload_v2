@@ -1,0 +1,27 @@
+I"ú(function() {
+  $(function() {
+    var modal_holder_selector;
+    modal_holder_selector = "#modal-holder";
+    $(document).on("click", "[data-behavior='modal']", function() {
+      var location;
+      $('body').modalmanager('loading');
+      location = $(this).attr("href");
+      $.get(location, function(data) {
+        return $(modal_holder_selector).html(data).find(".modal").modal("show");
+      });
+      return false;
+    });
+    return $(document).on("ajax:success", "[data-behavior='modal-form']", function(event, data, status, xhr) {
+      var url;
+      url = xhr.getResponseHeader("Location");
+      if (url) {
+        window.location = url;
+      } else {
+        $(".modal").modal("hide");
+      }
+      return false;
+    });
+  });
+
+}).call(this);
+:ET

@@ -1,0 +1,7 @@
+{
+  "name": "json_upload",
+  "private": true,
+  "dependencies": {
+    "jquery": "^3.2.1"
+  }
+}

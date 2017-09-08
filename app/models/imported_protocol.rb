@@ -1,0 +1,2 @@
+class ImportedProtocol < ApplicationRecord
+end

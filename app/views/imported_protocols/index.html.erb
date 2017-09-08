@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Imported Protocols</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @imported_protocols.each do |imported_protocol| %>
+      <tr>
+        <td><%= link_to 'Show', imported_protocol %></td>
+        <td><%= link_to 'Edit', edit_imported_protocol_path(imported_protocol) %></td>
+        <td><%= link_to 'Destroy', imported_protocol, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Imported Protocol', new_imported_protocol_path %>

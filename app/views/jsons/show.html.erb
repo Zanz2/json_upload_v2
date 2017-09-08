@@ -1,0 +1,375 @@
+
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Filename:</strong>
+  <%= @json.filename %>
+</p>
+
+<p>
+  <strong>Content type:</strong>
+  <%= @json.content_type %>
+</p>
+
+<p>
+  <strong>File contents:</strong>
+  <% #@json.file_contents %>
+</p>
+
+
+
+
+
+
+<% if false %>
+<% #da error ker ni še tega objekta v bazi %>
+<% link_to 'Edit', edit_json_path(@json) %> |
+<% link_to 'Back', jsons_path %>
+<% end %>
+<% #if false %>
+
+
+<a type="button" class="btn" style="width:100%;height:100%;" href="#test_modal" data-toggle="modal">odpri modalca</a>
+
+<div class="modal fade" style="width:9%;margin-left:5%;margin-right:5;" id="test_modal" >
+  <div class="modal-header" style="width:90%;margin-left:5%;margin-right:5%;">
+    <a class="close" data-dismiss="modal">&times;</a>
+    <h3>Uploading protocols.io File</h3>
+    <h5>Below you can review the data which will get imported</h5>
+  </div>
+  <div class="modal-body" style="width:90%;margin-left:5%;margin-right:5%;"  >
+    <style>
+    tr:hover{background-color:#f5f5f5}
+    td {padding-bottom: 10px;padding-top:10px;}
+
+
+    </style>
+    <table>
+      <tr>
+        <th>Description</th>
+        <th>Value</th>
+        <th>Notes</th>
+      </tr>
+
+      <tr>
+        <td> Protocol name</td>
+        <td> <%= @json.objekt["protocol_name"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Number of steps </td>
+        <td> <%= @json.objekt["number_of_steps"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Description of protocol </td>
+        <td> <%= @json.objekt["description"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td>  Manuscript citation </td>
+        <td> <%= @json.objekt["manuscript_citation"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td>  Protocol picture (Protocols.io) </td>
+        <td> <%= @json.objekt["big_protocol_img"] %></td>
+        <td> WIP</td>
+      </tr>
+
+      <% counter=0
+      whitelist_simple=["1","6","17"]
+      whitelist_complex=["8","9","15","18","19","20"]%>
+      <% #byebug %>
+<% @json.objekt["steps"].each do |step| %>
+      <tr>
+        <td> Step <%= (counter+=1).to_s %> </td>
+        <td> Step guid (Protocols.io) :<%= step["guid"] %>
+          <% #byebug %>
+          <% if counter>1 %>
+          <br>Guid of previous step (Protocols.io) :<%= step["previous_guid"] %>
+           <% end  #counter, prvi step nima previous guid%>
+  <% step["components"].each do |key,value|  %>
+          <% #byebug %>
+
+      <% if counter>1 #nevem zaka ampak v vseh njihovih izvoženih jsonih ima prvi korak čudno strukturo
+          #elementov, v kateri so shranjeni kot hash, katerega ključ je "0", vrednost pa komponenta, to zruši iteriranje v enem stavku
+          #trenutno sem porabil {5} ur da bi našel rešitev, tako da bi ena zanka naredila oboje.
+          # to je samo v  prvem koraku, naprej so vsi shranjeni brez tega arraya, in se po njih da normalno iterirat
+          %>
+          <% #byebug %>
+          <% if whitelist_simple.include?(key["component_type_id"]) && key["data"]!="" && key["name"] && key["data"]%>
+          <br>
+          <%= key["name"]+" : "+key["data"] %>
+          <% #byebug
+          #debug
+          #comp[counter];counter;@json.file_contents["steps"][3]["components"][0]["name"]
+          #@json.file_contents["steps"][0]["components"]
+          %>
+
+          <% elsif key && whitelist_complex.include?(key["component_type_id"]) %>
+          <% case key["component_type_id"]%>
+          <% when "8"%>
+          <br>
+          <%= "-"+key["name"]+" : "+key["source_data"]["name"] %>
+          <br>
+          Developer : <%= key["source_data"]["developer"] %>
+          <br>
+          Version : <%= key["source_data"]["version"] %>
+          <br>
+          Link : <%= key["source_data"]["link"] %>
+          <br>
+          Repository : <%= key["source_data"]["repository"] %>
+          <br>
+          OS name , OS version : <%= key["source_data"]["os_name"]+" , "+key["source_data"]["os_version"] %>
+
+          <% when "9"%>
+          <br>
+          <%= "-"+key["name"]+" : "+key["source_data"]["name"] %>
+          <br>
+          Link : <%= key["source_data"]["link"] %>
+
+
+          <% when "15"%>
+          <br>
+          <%= "-"+key["name"]+" : "+key["source_data"]["name"] %>
+          <br>
+          Description : <%= key["source_data"]["description"] %>
+          <br>
+          OS name , OS version : <%= key["source_data"]["os_name"]+" , "+key["source_data"]["os_version"] %>
+
+          <% when "18"%>
+
+          <% when "19"%>
+          <br>
+          <%= "-"+key["name"]+" : "+key["source_data"]["body"] %>
+          <br>
+          Link : <%= key["source_data"]["link"] %>
+
+
+          <% when "20"%>
+
+          <% else %>
+
+          <% end %>
+
+
+          <% end #notranji if št 1%>
+
+
+      <% else %>
+        <% unless value %>
+        <% value=key #json format ima random arraye namest hashov, ta problem je opisan pri if counter > 1 stavku %>
+        <% end %>
+          <% if whitelist_simple.include?(value["component_type_id"])&& value["data"]!="" && value["name"] && value["data"]  %>
+          <br>
+          <%= value["name"]+" : "+value["data"] %>
+          <% #byebug
+          #debug
+          #comp[counter];counter;@json.file_contents["steps"][3]["components"][0]["name"]
+          #@json.file_contents["steps"][0]["components"]
+          %>
+
+          <% elsif value && whitelist_complex.include?(value["component_type_id"]) %>
+          <% case value["component_type_id"]%>
+          <% when "8"%>
+          <br>
+          <%= "-"+value["name"]+" : "+value["source_data"]["name"] %>
+          <br>
+          Developer : <%= value["source_data"]["developer"] %>
+          <br>
+          Version : <%= value["source_data"]["version"] %>
+          <br>
+          Link : <%= value["source_data"]["link"] %>
+          <br>
+          Repository : <%= value["source_data"]["repository"] %>
+          <br>
+          OS name , OS version : <%= value["source_data"]["os_name"]+" , "+value["source_data"]["os_version"] %>
+
+          <% when "9"%>
+          <br>
+          <%= "-"+value["name"]+" : "+value["source_data"]["name"] %>
+          <br>
+          Link : <%= value["source_data"]["link"] %>
+
+
+          <% when "15"%>
+          <br>
+          <%= "-"+value["name"]+" : "+value["source_data"]["name"] %>
+          <br>
+          Description : <%= value["source_data"]["description"] %>
+          <br>
+          OS name , OS version : <%= value["source_data"]["os_name"]+" , "+value["source_data"]["os_version"] %>
+
+          <% when "18"%>
+
+          <% when "19"%>
+          <br>
+          <%= "-"+value["name"]+" : "+value["source_data"]["body"] %>
+          <br>
+          Link : <%= value["source_data"]["link"] %>
+
+
+          <% when "20"%>
+
+          <% else %>
+
+          <% end %>
+
+          <% end #notranji if št 2%>
+
+      <% end #zunanji if %>
+
+
+  <% end #komponente koraka %>
+        </td>
+        <td> WIP</td>
+      </tr>
+<% end  #posamezni koraki%>
+
+
+
+      <tr>
+        <td> Authors </td>
+        <td> <%= @json.objekt["authors"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Protocol link </td>
+        <td> <%= @json.objekt["link"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Id of protocol (protocols.io) </td>
+        <td> <%= @json.objekt["protocol_id"] %></td>
+        <td> WIP</td>
+      </tr>
+
+
+      <tr>
+        <td> Before start protocol information (protocols.io) </td>
+        <td> <%= @json.objekt["before_start"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Username of author (protocols.io) </td>
+        <td> <%= @json.objekt["username"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Uri of protocol (protocols.io) </td>
+        <td> <%= @json.objekt["uri"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Vendor name (Protocols.io) </td>
+        <td> <%= @json.objekt["vendor_name"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Vendor link (Protocols.io) </td>
+        <td> <%= @json.objekt["vendor_link"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Vendor logo (Protocols.io) </td>
+        <td> <%= @json.objekt["vendor_logo"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Warning (protocols.io)</td>
+        <td> <%= @json.objekt["warning"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Guidelines (Protocols.io) </td>
+        <td> <%= @json.objekt["guidelines"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Doi ?? (protocols.io)</td>
+        <td> <%= @json.objekt["doi"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Private link (Protocols.io)  </td>
+        <td> <%= @json.objekt["private_link"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Protocol keywords (Protocols.io) </td>
+        <td> <%= @json.objekt["keywords"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Last modified date (Protocols.io)  </td>
+        <td> <%= @json.objekt["last_modified"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Created on date (Protocols.io) </td>
+        <td> <%= @json.objekt["created_on"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> First published date (Protocols.io) </td>
+        <td> <%= @json.objekt["first_published_date"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Publish date (Protocols.io) </td>
+        <td> <%= @json.objekt["publish_date"] %></td>
+        <td> WIP</td>
+      </tr>
+      <tr>
+        <td> Tags (Protocols.io) </td>
+        <td> <% @json.objekt["tags"].each do |tag| %>
+          <%= tag["tag_name"]+" , "%>
+          <% end %>
+
+
+        </td>
+        <td> WIP</td>
+      </tr>
+
+
+
+    </table>
+    <% if false  %>
+    <% @json.objekt.each do |key,value| %>
+    <tr>
+      <td><%= key %></td>
+      <td><%= value %></td>
+      <td>WIP</td>
+    </tr>
+    <% end %>
+    <% end %>
+<%# @json.file_contents.key?("kljuc") %>
+  </div>
+  <div class="modal-footer" style="width:90%;margin-left:5%;margin-right:5%;">
+    <%= link_to "Discard protocol", new_json_path, class: "btn"%>
+    <% # <a href="#" class="btn" data-dismiss="modal">Discard protocol</a> # %>
+
+    <%= form_for @json, :url => {:action=>"save", :controller=>"jsons"},:html => { :method => "POST"} do |f| %>
+    <%=f.hidden_field :filename, :value => @json.filename%>
+    <%=f.hidden_field :content_type, :value => @json.content_type%>
+    <%=f.hidden_field :file_contents, :value => @json.file_contents%>
+    <%= f.hidden_field :objekt, :value => @json.objekt%>
+    <%#f.hidden_field :file, :value => @json.file%>
+    <% #byebug %>
+  <%= f.submit 'Import protocol', class: "btn btn-primary"%>
+<% end %>
+    <%#link_to "Import protocol",save_path(:testiranje => "ll"), class: "btn btn-primary", method: :post%>
+    <% #byebug#<a href="#" class="btn btn-primary">Import protocol</a> %>
+  </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#test_modal').modal('show');
+    });
+</script>
+<% if false %>
+<script type="text/javascript">
+$('#test_modal').modal('hide')
+</script>
+<% end %>

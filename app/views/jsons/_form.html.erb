@@ -1,0 +1,11 @@
+
+
+<%= form_for(@json) do |f| %>
+  <div class="field">
+    <%= f.file_field :file , {:onchange => 'this.form.submit()' } %>
+
+  </div>
+  <div class="actions">
+    <% # f.submit %>
+  </div>
+<% end %>

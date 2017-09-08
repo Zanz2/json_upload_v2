@@ -1,0 +1,17 @@
+<%= form_with(model: imported_protocol, local: true) do |form| %>
+  <% if imported_protocol.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(imported_protocol.errors.count, "error") %> prohibited this imported_protocol from being saved:</h2>
+
+      <ul>
+      <% imported_protocol.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
